@@ -2,7 +2,22 @@ import tkinter as tk
 import math
 import random
 import requests
+import sys
 
+word_file = "/usr/share/dict/wordss"
+word_site = "http://svnweb.freebsd.org/csrg/share/dict/words?view=co&content-type=text/plain"
+
+def load_from_web(slova):
+    response = requests.get(word_site)
+    slova += response.content.splitlines()
+def load_from_file(slova):
+    try:
+        tmp_word_file = open(word_file).read()
+        slova += (tmp_word_file.splitlines())
+    except OSError as err:
+        print("Error when opening file", format(err))
+        print("Trying to get words from .NET")
+        load_from_web(slova)
 
 def prepare(n,x,y,d,l,canvas):
     for i in range(n):
@@ -30,36 +45,27 @@ suradnice = [(150,500,250,550),(200,200,200,500),
 (400,300,430,375),(400,300,400,400),(400,400,350,475),
 (400,400,450,475)]
 
-#slova = ['jablcko','mrkvicka','melonik','ceresnicka','vortex']
-word_file = "/usr/share/dict/words"
-slova = open(word_file).read().splitlines()
-#word_site = "http://svnweb.freebsd.org/csrg/share/dict/words?view=co&content-type=text/plain"
+slova = []
+load_from_file(slova)
+hadane_slovo = slova[random.randrange(len(slova))].decode('utf-8')
 
-#response = requests.get(word_site)
-#slova = response.content.splitlines()
-
-#response = urllib2.urlopen(word_site)
-#txt = response.read()
-#WORDS = txt.splitlines()
-
-hadane_slovo = random.randrange(len(slova))
-slova[hadane_slovo] = slova[hadane_slovo].lower()
+hadane_slovo = hadane_slovo.lower()
 pocet_zivotov = 12
 uhadnute = []
-counter = len(slova[hadane_slovo])
+counter = len(hadane_slovo)
 dlzka_medzier = 10
 dlzka_ciary = 20
-prepare(len(slova[hadane_slovo]),200,650,dlzka_medzier,dlzka_ciary,canvas)
+prepare(len(hadane_slovo),200,650,dlzka_medzier,dlzka_ciary,canvas)
 
 while ((pocet_zivotov > 0) & (counter > 0)):
     c = input('Tipnite si pismenko: ')
-    if c in slova[hadane_slovo]:
+    if c in hadane_slovo:
         if c not in uhadnute:
             print('Ano, je tam')
             uhadnute.append(c)
-            counter -= slova[hadane_slovo].count(c)
-            for i in range(len(slova[hadane_slovo])):
-                if slova[hadane_slovo][i] == c:
+            counter -= hadane_slovo.count(c)
+            for i in range(len(hadane_slovo)):
+                if hadane_slovo[i] == c:
                     vypis_pismenko(210,640,i,dlzka_medzier,dlzka_ciary,canvas,c)
 
         else:
@@ -71,10 +77,10 @@ while ((pocet_zivotov > 0) & (counter > 0)):
 
 if counter == 0:
     print("Uhadol si!!!")
-    print(slova[hadane_slovo])
+    print(hadane_slovo)
     canvas.create_oval(200,200,600,600,fill='green')
 if pocet_zivotov == 0:
     print("GAME OVER")
-    print(slova[hadane_slovo])
+    print(hadane_slovo)
 
 canvas.mainloop()
