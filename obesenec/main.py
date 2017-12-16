@@ -4,7 +4,7 @@ import random
 import requests
 import sys
 
-word_file = "/usr/share/dict/wordss"
+word_file = "/usr/share/dict/words"
 word_site = "http://svnweb.freebsd.org/csrg/share/dict/words?view=co&content-type=text/plain"
 
 def load_from_web(slova):
@@ -35,7 +35,53 @@ def kresli_obesenca(n,polohy,canvas):
         canvas.create_oval(polohy[5][0],polohy[5][1],polohy[5][2],polohy[5][3])
     if (n != 11) & (n != 6):
         canvas.create_line(polohy[11-n][0],polohy[11-n][1],polohy[11-n][2],polohy[11-n][3])
+def game(slova, canvas):
+    splna = True
+    while (splna):
+        hadane_slovo = slova[random.randrange(len(slova))].decode('utf-8')
+        if "'" not in hadane_slovo:
+             splna = False
 
+
+    hadane_slovo = hadane_slovo.lower()
+    pocet_zivotov = 12
+    uhadnute = []
+    neuhadnute = []
+    counter = len(hadane_slovo)
+    dlzka_medzier = 10
+    dlzka_ciary = 20
+    prepare(len(hadane_slovo),200,650,dlzka_medzier,dlzka_ciary,canvas)
+
+    while ((pocet_zivotov > 0) & (counter > 0)):
+        c = input('Tipnite si pismenko: ')
+        if c in hadane_slovo:
+            if c not in uhadnute:
+                print('Ano, je tam')
+                uhadnute.append(c)
+                counter -= hadane_slovo.count(c)
+                for i in range(len(hadane_slovo)):
+                    if hadane_slovo[i] == c:
+                        vypis_pismenko(210,640,i,dlzka_medzier,dlzka_ciary,canvas,c)
+            else:
+                print('Toto si uz tipol')
+        elif c in neuhadnute:
+            print('Toto si uz tipol')
+        elif c != '':
+            pocet_zivotov -= 1
+            kresli_obesenca(pocet_zivotov,suradnice,canvas)
+            print('Smola, nie je tam')
+            neuhadnute.append(c)
+
+    if counter == 0:
+        print("Uhadol si!!!")
+        print(hadane_slovo)
+        canvas.create_text(300,300,text='YOU WON',font='arial 50',fill='green')
+    if pocet_zivotov == 0:
+        print("GAME OVER")
+        print(hadane_slovo)
+        canvas.create_text(300,300,text='GAME OVER',font='arial 50',fill='red')
+
+#mainloop
 canvas = tk.Canvas(bg = 'white', width = 600, height = 800)
 canvas.pack()
 
@@ -47,58 +93,14 @@ suradnice = [(150,500,250,550),(200,200,200,500),
 
 slova = []
 load_from_file(slova)
-splna = True
-
-while (splna):
-    hadane_slovo = slova[random.randrange(len(slova))].decode('utf-8')
-    if "'" not in hadane_slovo:
-         splna = False
-
-
-hadane_slovo = hadane_slovo.lower()
-pocet_zivotov = 12
-uhadnute = []
-neuhadnute = []
-counter = len(hadane_slovo)
-dlzka_medzier = 10
-dlzka_ciary = 20
-prepare(len(hadane_slovo),200,650,dlzka_medzier,dlzka_ciary,canvas)
-
-while ((pocet_zivotov > 0) & (counter > 0)):
-    c = input('Tipnite si pismenko: ')
-    if c in hadane_slovo:
-        if c not in uhadnute:
-            print('Ano, je tam')
-            uhadnute.append(c)
-            counter -= hadane_slovo.count(c)
-            for i in range(len(hadane_slovo)):
-                if hadane_slovo[i] == c:
-                    vypis_pismenko(210,640,i,dlzka_medzier,dlzka_ciary,canvas,c)
-        else:
-            print('Toto si uz tipol')
-    elif c in neuhadnute:
-        print('Toto si uz tipol')
-    elif c != '':
-        pocet_zivotov -= 1
-        kresli_obesenca(pocet_zivotov,suradnice,canvas)
-        print('Smola, nie je tam')
-        neuhadnute.append(c)
-
-if counter == 0:
-    print("Uhadol si!!!")
-    print(hadane_slovo)
-    canvas.create_text(300,300,text='YOU WON',font='arial 50',fill='green')
-if pocet_zivotov == 0:
-    print("GAME OVER")
-    print(hadane_slovo)
-    canvas.create_text(300,300,text='GAME OVER',font='arial 50',fill='red')
-
-if counter == 0 or pocet_zivotov == 0:
-    d = input('Skusit znova?(Y/N)  ')
-#if d == 'Y' or d == 'y':
-    #hento cele dame do funkcie
-    #tak znova sa len pusti ta funkcia
-if d == 'N' or d == 'n':
-    sys.exit()
+game(slova, canvas)
+while(True):
+    d = input('Skusit znova?(Y/N)')
+    if d == 'Y' or d == 'y':
+        canvas.create_rectangle(0,0,600,800,fill = 'white')
+        game(slova, canvas)
+    else:
+        sys.exit()
+        break
 
 canvas.mainloop()
