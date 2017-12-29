@@ -10,14 +10,14 @@ word_site = "http://svnweb.freebsd.org/csrg/share/dict/words?view=co&content-typ
 def load_from_web(slova):
     response = requests.get(word_site)
     slova += response.content.splitlines()
-def load_from_file(slova):
-    try:
-        tmp_word_file = open(word_file).read()
-        slova += (tmp_word_file.splitlines())
-    except OSError as err:
-        print("Error when opening file", format(err))
-        print("Please wait")
-        load_from_web(slova)
+#def load_from_file(slova):
+#    try:
+#        tmp_word_file = open(word_file).read()
+#        slova += (tmp_word_file.splitlines())
+#    except OSError as err:
+#        print("Error when opening file", format(err))
+#        print("Please wait")
+#        load_from_web(slova)
 
 def prepare(n,x,y,d,l,canvas):
     for i in range(n):
@@ -35,9 +35,11 @@ def kresli_obesenca(n,polohy,canvas):
         canvas.create_oval(polohy[5][0],polohy[5][1],polohy[5][2],polohy[5][3])
     if (n != 11) & (n != 6):
         canvas.create_line(polohy[11-n][0],polohy[11-n][1],polohy[11-n][2],polohy[11-n][3])
+
 def game(slova, canvas):
     splna = True
     while (splna):
+        #hadane_slovo = slova[random.randrange(len(slova))]
         hadane_slovo = slova[random.randrange(len(slova))].decode('utf-8')
         if "'" not in hadane_slovo:
              splna = False
@@ -92,7 +94,7 @@ suradnice = [(150,500,250,550),(200,200,200,500),
 (400,400,450,475)]
 
 slova = []
-load_from_file(slova)
+load_from_web(slova)
 game(slova, canvas)
 while(True):
     d = input('Skusit znova?(Y/N)')
